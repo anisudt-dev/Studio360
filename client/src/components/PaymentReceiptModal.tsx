@@ -20,7 +20,14 @@ export function PaymentReceiptModal({ payment, booking, onClose }: PaymentReceip
 
   useEffect(() => {
     api.getSettings().then(setSettings).catch(() => null);
-  }, []);
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
 
   const studioName = settings?.studio_name && settings.studio_name !== 'Studio ERP' ? settings.studio_name : 'Aishwarya Videos & Photos';
   const logoUrl = settings?.logo_url || '/logo.svg';
@@ -62,21 +69,25 @@ export function PaymentReceiptModal({ payment, booking, onClose }: PaymentReceip
     } finally {
       setSendingEmail(false);
     }
-  }
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden my-8">
+  }  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-gray-900/70 backdrop-blur-xs overflow-hidden"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-2xl max-h-[92vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden my-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         
-        {/* Action Header (Hidden during print) */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between no-print bg-gray-50/80">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+        {/* Sticky Action Header (Always visible at top, hidden during print) */}
+        <div className="sticky top-0 z-30 px-5 py-3.5 border-b border-gray-200 flex items-center justify-between no-print bg-white/95 backdrop-blur-md shrink-0 shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
               <CheckCircle2 size={18} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-gray-900">Payment Receipt</h3>
-              <p className="text-[11px] text-gray-500">{receiptNo}</p>
+              <h3 className="text-sm font-extrabold text-gray-900 leading-tight">Payment Receipt</h3>
+              <p className="text-[11px] font-mono text-gray-500">{receiptNo}</p>
             </div>
           </div>
 
@@ -84,34 +95,37 @@ export function PaymentReceiptModal({ payment, booking, onClose }: PaymentReceip
             <button
               onClick={handleEmailReceipt}
               disabled={sendingEmail}
-              className="px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-bold transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              title="Email receipt to customer"
             >
               <Mail size={14} /> Email
             </button>
             {customer?.mobile && (
               <button
                 onClick={handleWhatsAppShare}
-                className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold transition-colors flex items-center gap-1.5"
+                title="Send receipt on WhatsApp"
               >
                 <MessageCircle size={14} /> WhatsApp
               </button>
             )}
-            <Button size="sm" onClick={handlePrint}>
-              <Printer size={14} /> Print Receipt
+            <Button size="sm" onClick={handlePrint} className="bg-gray-900 hover:bg-black text-white font-bold">
+              <Printer size={14} /> Print
             </Button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-200/60 transition-colors ml-1"
+              title="Close Receipt (Esc)"
+              className="p-2 rounded-xl text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors ml-1 border border-gray-200/80 active:scale-95"
             >
-              <X size={18} />
+              <X size={18} className="stroke-[2.5]" />
             </button>
           </div>
         </div>
 
-
-        {/* Printable Receipt Container */}
-        <div className="p-8 lg:p-10 bg-white print-area">
+        {/* Printable Receipt Container (Scrollable body) */}
+        <div className="flex-1 overflow-y-auto p-6 sm:p-10 bg-white print-area">
           {/* 1. Receipt Top Header */}
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-gray-900">
             <div className="flex items-center gap-3">
               <img src={logoUrl} alt={studioName} className="h-14 max-w-[200px] object-contain shrink-0" />
