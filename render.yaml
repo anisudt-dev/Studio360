@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: photography-erp-api
+    env: node
+    buildCommand: cd client && npm install && npm run build && cd ../server && npm install
+    startCommand: cd server && node index.js
+    envVars:
+      - key: PORT
+        value: 10000
