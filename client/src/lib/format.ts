@@ -1,8 +1,11 @@
-export function formatCurrency(amount: number, symbol = '₹'): string {
-  const rounded = Math.round(amount);
+export function formatCurrency(amount: number | string | null | undefined, symbol = '₹'): string {
+  const num = typeof amount === 'number' ? amount : (amount ? Number(amount) : 0);
+  const safeNum = isNaN(num) ? 0 : num;
+  const rounded = Math.round(safeNum);
   const formatted = rounded.toLocaleString('en-IN');
   return `${symbol}${formatted}`;
 }
+
 
 export function toISODateString(d: Date): string {
   const y = d.getFullYear();

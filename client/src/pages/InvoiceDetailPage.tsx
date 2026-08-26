@@ -22,27 +22,55 @@ export function InvoiceDetailPage({ id }: { id: string }) {
   const [invoice, setInvoice] = useState<InvoiceWithFullBooking | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     Promise.all([
-      supabase
-        .from('invoices')
-        .select('*, booking:bookings(*, customer:customers(id,name,mobile,email,address))')
-        .eq('id', id)
-        .maybeSingle(),
+      api.getInvoice(id).catch(() =>
+        supabase
+          .from('invoices')
+          .select('*, booking:bookings(*, customer:customers(id,name,mobile,email,address))')
+          .eq('id', id)
+          .maybeSingle()
+          .then((res) => res.data)
+          .catch(() => null)
+      ),
       api.getSettings().catch(() => null),
-    ]).then(([{ data: invoiceData }, settingsData]) => {
-      setInvoice(invoiceData as InvoiceWithFullBooking | null);
-      setSettings(settingsData);
-      setLoading(false);
-    });
+    ])
+      .then(([invoiceData, settingsData]) => {
+        if (invoiceData) {
+          setInvoice(invoiceData as InvoiceWithFullBooking);
+        } else {
+          setError('Invoice record could not be loaded or was not found.');
+        }
+        setSettings(settingsData);
+      })
+      .catch((err) => {
+        setError(err.message || 'Failed to load invoice details');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [id]);
 
   if (loading) return <div className="space-y-4 max-w-3xl mx-auto"><Skeleton className="h-40" /><Skeleton className="h-96" /></div>;
-  if (!invoice) return <EmptyState icon={<Camera size={26} />} title="Invoice not found" />;
+  if (error || !invoice) {
+    return (
+      <div className="max-w-xl mx-auto py-12 text-center space-y-4">
+        <EmptyState icon={<Camera size={26} />} title="Invoice Not Found" description={error || "The requested invoice could not be located in your studio database."} />
+
+        <Button variant="secondary" onClick={() => navigate({ page: 'invoices' })}>
+          <ArrowLeft size={16} /> Return to Invoices Directory
+        </Button>
+      </div>
+    );
+  }
 
   const booking = invoice.booking;
   const customer = booking?.customer;
+
 
   // Calculate payments
   const totalAmount = invoice.total || booking?.total_amount || 0;

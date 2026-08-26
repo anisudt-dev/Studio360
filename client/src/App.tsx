@@ -57,12 +57,16 @@ function Modals() {
   );
 }
 
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+
 export default function App() {
   return (
     <AuthProvider>
       <NavProvider>
         <AppShell>
-          <Router />
+          <ErrorBoundary>
+            <Router />
+          </ErrorBoundary>
         </AppShell>
         <GlobalSearch />
         <Modals />
@@ -71,3 +75,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+
