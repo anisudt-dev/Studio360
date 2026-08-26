@@ -2,13 +2,14 @@ import { useState, type ReactNode } from 'react';
 import {
   LayoutDashboard, Users, CalendarCheck, Wallet,
   CalendarDays, FileText, BarChart3, Settings, Home, Menu as MenuIcon,
-  Plus, Search, Camera, ChevronDown, User, Package, LogOut, Shield
+  Plus, Search, Camera, ChevronDown, User, Package, LogOut, Shield, Sparkles
 } from 'lucide-react';
 import { useNav } from '@/lib/nav';
 import { useAuth } from '@/lib/auth';
 import { useBookings } from '@/lib/hooks';
 import { LoginPage } from '@/pages/LoginPage';
 import { NAV_ITEMS, MOBILE_NAV, MORE_NAV } from '@/lib/constants';
+import { ReleaseNotesModal, APP_VERSION } from '@/components/ReleaseNotesModal';
 
 const ICONS: Record<string, any> = {
   LayoutDashboard, Users, CalendarCheck, Wallet,
@@ -22,6 +23,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [releaseNotesOpen, setReleaseNotesOpen] = useState(false);
+
 
   const activeBookingsCount = bookings.filter((b) => b.status !== 'cancelled').length;
   const pendingPaymentsCount = bookings.filter((b) => b.status !== 'cancelled' && b.balance > 0).length;
@@ -144,8 +147,19 @@ export function AppShell({ children }: { children: ReactNode }) {
               <kbd className="hidden md:inline ml-auto text-[10px] font-semibold text-gray-400 bg-white border border-gray-200 rounded px-1.5 py-0.5 shadow-2xs">⌘K</kbd>
             </button>
 
+            {/* What's New Version Badge */}
+            <button
+              onClick={() => setReleaseNotesOpen(true)}
+              title="View Version Release Notes & Enhancement Log"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-teal-50 text-teal-800 border border-teal-200/80 hover:bg-teal-100 text-xs font-bold font-mono transition-colors shrink-0"
+            >
+              <Sparkles size={14} className="text-teal-600 animate-pulse" />
+              <span>{APP_VERSION}</span>
+            </button>
+
             {/* Quick add */}
             <div className="relative">
+
               <button
                 onClick={() => setQuickAddOpen((v) => !v)}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-teal-700 text-white px-3 py-2 text-sm font-semibold hover:bg-teal-800 transition-colors shadow-sm"
@@ -306,6 +320,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       )}
+
+      <ReleaseNotesModal
+        open={releaseNotesOpen}
+        onClose={() => setReleaseNotesOpen(false)}
+      />
     </div>
   );
 }
+
