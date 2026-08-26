@@ -309,6 +309,51 @@ export async function initDb() {
     console.log('👤 Seeded default admin user (username: admin, password: admin123)');
   }
 
+  // Seed sample customer & booking records if empty
+  const customerCount = await Customer.count();
+  if (customerCount === 0) {
+    const defaultCust = await Customer.create({
+      id: 'cust-anish-1',
+      name: 'Anish',
+      mobile: '9790551555',
+      email: 'anish@example.com',
+      address: 'Chennai, Tamil Nadu',
+      notes: 'Sample Studio VIP Client',
+    });
+
+    const bookingCount = await Booking.count();
+    if (bookingCount === 0) {
+      await Booking.create({
+        id: 'book-wedding-1',
+        customer_id: defaultCust.id,
+        title: 'Anish Wedding Photography',
+        event_type: 'Wedding',
+        event_date: '2026-08-28',
+        start_time: '09:00',
+        venue: 'Grand Palace Convention Center',
+        total_amount: 34000,
+        paid_amount: 10000,
+        balance: 24000,
+        status: 'confirmed',
+        project_status: 'editing',
+        package_name: 'Premium Wedding & Drone Package',
+        notes: 'Full day coverage with drone and teaser highlights',
+      });
+
+      await Payment.create({
+        id: 'pay-advance-1',
+        booking_id: 'book-wedding-1',
+        amount: 10000,
+        payment_date: '2026-08-25',
+        payment_mode: 'UPI',
+        reference: 'UPI/9876543210',
+        notes: 'Advance booking payment received',
+      });
+    }
+    console.log('📦 Seeded initial studio records (Anish Customer, Wedding Booking, Advance Receipt)');
+  }
+
+
   console.log(`⚡ Sequelize ORM initialized successfully! (Dialect: ${dialect})`);
 }
 
