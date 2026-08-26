@@ -103,9 +103,39 @@ body {
   border-color: var(--color-brand);
 }
 
+/* Mobile layout safety & floating badge cleanup */
+@media (max-width: 1023px) {
+  iframe[src*="bolt"], [class*="bolt-"], .bolt-badge, [id*="bolt-"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
 /* Print styles for invoices */
 @media print {
-  .no-print { display: none !important; }
-  body { background: white; }
-  .print-area { box-shadow: none !important; border: none !important; }
+
+  .no-print, header, aside, nav, .toast-container, button {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  .print-area {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
 }
+

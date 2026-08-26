@@ -51,15 +51,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex bg-[#f7f8fa]">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-60 border-r border-gray-200 bg-white shrink-0 sticky top-0 h-screen">
-        <div className="px-5 py-5 flex items-center gap-2.5 border-b border-gray-100">
-          <div className="w-9 h-9 rounded-xl bg-teal-700 flex items-center justify-center text-white shrink-0 shadow-md shadow-teal-700/20">
-            <Camera size={18} />
-          </div>
-          <div className="leading-tight">
-            <p className="text-sm font-bold text-gray-900">Studio Manager</p>
-            <p className="text-[11px] text-gray-400">Photography ERP</p>
-          </div>
+      <aside className="hidden lg:flex flex-col w-60 border-r border-gray-200 bg-white shrink-0 sticky top-0 h-screen no-print">
+        <div className="px-4 py-4 flex items-center justify-center border-b border-gray-100 bg-white">
+          <img src="/logo.svg" alt="Aishwarya Videos & Photos" className="h-12 max-w-full object-contain cursor-pointer" onClick={() => handleNav('dashboard')} />
         </div>
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {NAV_ITEMS.map((item) => {
@@ -128,14 +122,14 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 no-print">
+
           <div className="flex items-center gap-3 px-4 lg:px-6 h-16">
             {/* Mobile logo */}
             <div className="lg:hidden flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-teal-700 flex items-center justify-center text-white">
-                <Camera size={16} />
-              </div>
+              <img src="/logo.svg" alt="Aishwarya Videos & Photos" className="h-8 max-w-[160px] object-contain cursor-pointer" onClick={() => handleNav('dashboard')} />
             </div>
+
 
             {/* Search trigger */}
             <button
@@ -163,7 +157,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               {quickAddOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setQuickAddOpen(false)} />
-                  <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 animate-scale-in">
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 animate-scale-in">
                     <p className="px-3.5 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Quick Actions</p>
                     {[
                       { label: 'New Booking', icon: CalendarCheck, action: () => openModal('addBooking', {}) },
@@ -252,13 +246,14 @@ export function AppShell({ children }: { children: ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-5 lg:p-8 pb-24 lg:pb-8 max-w-[1400px] w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-5 lg:p-8 pb-28 lg:pb-8 max-w-[1400px] w-full mx-auto">
           {children}
         </main>
       </div>
 
       {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-gray-200 flex items-center justify-around px-2 h-16 safe-area">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-[60] bg-white/95 backdrop-blur-md border-t border-gray-200 flex items-center justify-around px-1 sm:px-2 h-16 safe-area shadow-lg">
+
         {MOBILE_NAV.map((item) => {
           const Icon = ICONS[item.icon] || Home;
           const active = isActive(item.id);

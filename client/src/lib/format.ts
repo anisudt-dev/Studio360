@@ -4,16 +4,39 @@ export function formatCurrency(amount: number, symbol = '₹'): string {
   return `${symbol}${formatted}`;
 }
 
+export function toISODateString(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+export function todayISO(): string {
+  return toISODateString(new Date());
+}
+
 export function formatDate(date: string | null | undefined): string {
   if (!date) return '—';
-  const d = new Date(date);
+  const parts = date.split('-');
+  let d: Date;
+  if (parts.length === 3) {
+    d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  } else {
+    d = new Date(date);
+  }
   if (isNaN(d.getTime())) return '—';
   return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 export function formatShortDate(date: string | null | undefined): string {
   if (!date) return '—';
-  const d = new Date(date);
+  const parts = date.split('-');
+  let d: Date;
+  if (parts.length === 3) {
+    d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  } else {
+    d = new Date(date);
+  }
   if (isNaN(d.getTime())) return '—';
   return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 }
@@ -53,9 +76,7 @@ export function greeting(): string {
   return 'Good evening';
 }
 
-export function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+
 
 export function monthLabel(d: Date): string {
   return d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });

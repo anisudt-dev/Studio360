@@ -14,6 +14,7 @@ import {
   BOOKING_STATUS_STYLE, PROJECT_STATUS_STYLE, paymentStatus, PAYMENT_STATUS_STYLE, PROJECT_FLOW,
   nextAction,
 } from '@/lib/constants';
+import { PaymentReceiptModal } from '@/components/PaymentReceiptModal';
 import type { BookingWithCustomer, Payment, Invoice } from '@/lib/types';
 
 const CURRENCY = '₹';
@@ -25,6 +26,8 @@ export function BookingDetailPage({ id }: { id: string }) {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [showStatusMenu, setShowStatusMenu] = useState(false);
+  const [selectedPaymentReceipt, setSelectedPaymentReceipt] = useState<Payment | null>(null);
+
 
   async function refresh() {
     setLoading(true);
@@ -114,22 +117,27 @@ export function BookingDetailPage({ id }: { id: string }) {
       {/* Money section — impossible to miss */}
       <Card className={`p-6 mb-6 ${booking.balance > 0 ? 'border-amber-200' : 'border-emerald-200'}`}>
         <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Money</h2>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm text-gray-400">Total</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{formatCurrency(booking.total_amount, CURRENCY)}</p>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-gray-400 truncate">Total</p>
+            <p className="text-base sm:text-2xl font-extrabold text-gray-900 mt-1 truncate" title={formatCurrency(booking.total_amount, CURRENCY)}>
+              {formatCurrency(booking.total_amount, CURRENCY)}
+            </p>
           </div>
-          <div>
-            <p className="text-sm text-gray-400">Received</p>
-            <p className="text-2xl font-bold text-emerald-600 mt-1">{formatCurrency(booking.paid_amount, CURRENCY)}</p>
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-gray-400 truncate">Received</p>
+            <p className="text-base sm:text-2xl font-extrabold text-emerald-600 mt-1 truncate" title={formatCurrency(booking.paid_amount, CURRENCY)}>
+              {formatCurrency(booking.paid_amount, CURRENCY)}
+            </p>
           </div>
-          <div>
-            <p className="text-sm text-gray-400">Balance</p>
-            <p className={`text-2xl font-bold mt-1 ${booking.balance > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-gray-400 truncate">Balance</p>
+            <p className={`text-base sm:text-2xl font-extrabold mt-1 truncate ${booking.balance > 0 ? 'text-red-600' : 'text-emerald-600'}`} title={formatCurrency(booking.balance, CURRENCY)}>
               {formatCurrency(booking.balance, CURRENCY)}
             </p>
           </div>
         </div>
+
         <div className="mt-5">
           <ProgressBar value={paidPct} />
           <div className="flex items-center justify-between mt-3">
@@ -229,11 +237,26 @@ export function BookingDetailPage({ id }: { id: string }) {
                   <p className="text-base font-semibold text-gray-900">{formatCurrency(p.amount, CURRENCY)}</p>
                   <p className="text-sm text-gray-500">{formatDate(p.payment_date)} · {p.payment_mode}{p.reference ? ` · ${p.reference}` : ''}</p>
                 </div>
+                <button
+                  onClick={() => setSelectedPaymentReceipt(p)}
+                  className="px-3 py-1.5 rounded-xl bg-teal-50 text-teal-700 hover:bg-teal-100 text-xs font-bold transition-colors flex items-center gap-1.5"
+                >
+                  <FileText size={14} /> Receipt
+                </button>
               </div>
             ))}
           </div>
         </Card>
       )}
+
+      {selectedPaymentReceipt && booking && (
+        <PaymentReceiptModal
+          payment={selectedPaymentReceipt}
+          booking={booking}
+          onClose={() => setSelectedPaymentReceipt(null)}
+        />
+      )}
+
 
       {/* Notes section */}
       {booking.notes && (

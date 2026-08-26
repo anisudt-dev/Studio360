@@ -8,7 +8,7 @@ export interface Route {
 
 export interface ModalState {
   addCustomer: null | { onDone?: (id: string) => void };
-  addBooking: null | { presetCustomerId?: string };
+  addBooking: null | { presetCustomerId?: string; customerId?: string; date?: string };
   recordPayment: null | { bookingId?: string };
   addInvoice: null | { bookingId?: string };
   editCustomer: null | { id: string };
@@ -19,11 +19,12 @@ interface NavContextValue {
   route: Route;
   navigate: (route: Route) => void;
   modals: ModalState;
-  openModal: <K extends keyof ModalState>(key: K, value: NonNullable<ModalState[K]>) => void;
+  openModal: (key: keyof ModalState | (string & {}), value?: any) => void;
   closeModal: (key: keyof ModalState) => void;
   searchOpen: boolean;
   setSearchOpen: (open: boolean) => void;
 }
+
 
 const NavContext = createContext<NavContextValue | null>(null);
 
@@ -52,9 +53,10 @@ export function NavProvider({ children }: { children: ReactNode }) {
     window.scrollTo(0, 0);
   }, []);
 
-  const openModal = useCallback(<K extends keyof ModalState>(key: K, value: NonNullable<ModalState[K]>) => {
+  const openModal = useCallback((key: any, value?: any) => {
     setModals((m) => ({ ...m, [key]: value }));
   }, []);
+
   const closeModal = useCallback((key: keyof ModalState) => {
     setModals((m) => ({ ...m, [key]: null }));
   }, []);

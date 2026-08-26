@@ -6,7 +6,8 @@ import {
 import { useBookings } from '@/lib/hooks';
 import { useNav } from '@/lib/nav';
 import { Card, Button, PageHeader, Skeleton, Badge } from '@/components/ui';
-import { formatDate, formatTime, monthLabel, todayISO, daysFromNow, formatCurrency } from '@/lib/format';
+import { formatDate, formatTime, monthLabel, todayISO, daysFromNow, formatCurrency, toISODateString } from '@/lib/format';
+
 import { PROJECT_STATUS_STYLE } from '@/lib/constants';
 import type { BookingWithCustomer } from '@/lib/types';
 
@@ -158,7 +159,8 @@ export function CalendarPage() {
       {view === 'week' && (
         <div className="space-y-4">
           {weekDays.map((d) => {
-            const iso = d.toISOString().slice(0, 10);
+            const iso = toISODateString(d);
+
             const events = eventsByDate[iso] || [];
             const isToday = iso === today;
             const dn = daysFromNow(iso);
@@ -231,7 +233,8 @@ export function CalendarPage() {
             <div className="grid grid-cols-7 gap-1.5">
               {calendarDays.map((date, i) => {
                 if (!date) return <div key={i} className="aspect-square bg-gray-50/20 rounded-xl" />;
-                const iso = date.toISOString().slice(0, 10);
+                const iso = toISODateString(date);
+
                 const events = eventsByDate[iso] || [];
                 const isToday = iso === today;
                 const isSelected = iso === selectedDate;

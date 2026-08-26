@@ -40,12 +40,13 @@ export function LoginPage() {
         
         {/* Header Logo & Title */}
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4">
-            <Camera className="w-7 h-7 text-slate-950 stroke-[2.2]" />
+          <div className="bg-white rounded-2xl p-4 shadow-xl mb-4 border border-slate-700/50 flex items-center justify-center">
+            <img src="/logo.svg" alt="Aishwarya Videos & Photos" className="h-14 max-w-[200px] object-contain" />
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Studio ERP</h1>
-          <p className="text-sm text-slate-400 mt-1">Sign in to manage your photography studio</p>
+          <h1 className="text-xl font-bold text-white tracking-tight">Studio Management System</h1>
+          <p className="text-xs text-slate-400 mt-1">Sign in to manage your photography studio</p>
         </div>
+
 
         {/* Credentials Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">

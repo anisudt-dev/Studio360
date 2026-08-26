@@ -234,10 +234,13 @@ export const Setting = sequelize.define('Setting', {
   phone: DataTypes.STRING,
   email: DataTypes.STRING,
   address: DataTypes.TEXT,
+  logo_url: DataTypes.TEXT,
+  gstin: DataTypes.STRING,
 }, {
   tableName: 'settings',
   timestamps: false,
 });
+
 
 // --- RELATIONSHIPS / ASSOCIATIONS ---
 
@@ -276,15 +279,22 @@ export async function initDb() {
     console.error('Deduplication error:', err);
   }
 
-  // Seed default settings row if empty
-  const settingsCount = await Setting.count();
-  if (settingsCount === 0) {
+  // Seed or update default settings row with Aishwarya Videos & Photos brand profile
+  const existingSetting = await Setting.findOne();
+  if (!existingSetting) {
     await Setting.create({
       id: 'default-settings-1',
-      studio_name: 'Studio ERP',
+      studio_name: 'Aishwarya Videos & Photos',
       currency_symbol: '₹',
+      logo_url: '/logo.svg',
+    });
+  } else if (!existingSetting.logo_url || existingSetting.studio_name === 'Studio ERP') {
+    await existingSetting.update({
+      studio_name: 'Aishwarya Videos & Photos',
+      logo_url: '/logo.svg',
     });
   }
+
 
   // Seed default admin user if empty
   const userCount = await User.count();

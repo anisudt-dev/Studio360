@@ -1,21 +1,24 @@
 import { useMemo, useState } from 'react';
 import {
   TrendingUp, CalendarCheck, Wallet, CheckCircle2, XCircle, BarChart3,
-  Download, Printer, Filter, Mail, Sparkles, PieChart, FileText
+  Download, Printer, Filter, Mail, Sparkles, PieChart, FileText, ShieldAlert
 } from 'lucide-react';
 import { useBookings } from '@/lib/hooks';
 import { Card, PageHeader, Skeleton, ProgressBar, Select, Button } from '@/components/ui';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { EVENT_TYPES } from '@/lib/constants';
 import { toast } from '@/components/Toast';
+import { OutstandingReport } from '@/components/OutstandingReport';
 
 const CURRENCY = '₹';
 
 export function ReportsPage() {
   const { bookings, loading } = useBookings();
+  const [activeTab, setActiveTab] = useState<'analytics' | 'outstanding'>('analytics');
   const [timeRange, setTimeRange] = useState<'6m' | 'year' | 'all'>('6m');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [autoEmailEnabled, setAutoEmailEnabled] = useState(false);
+
 
   // Filtered Bookings
   const filteredBookings = useMemo(() => {
@@ -126,35 +129,68 @@ export function ReportsPage() {
         title="Reports & Financial Analytics"
         subtitle="Comprehensive studio business performance, revenue trends, and metrics"
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={toggleAutoEmail}
-              title="Toggle Automated Monthly Digest Email"
-              className={`px-3.5 py-2 rounded-xl border text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs ${
-                autoEmailEnabled ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              <Mail size={15} className={autoEmailEnabled ? 'text-teal-600' : 'text-gray-400'} />
-              {autoEmailEnabled ? 'Auto Email: Active' : 'Enable Auto Email'}
-            </button>
+          activeTab === 'analytics' ? (
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={toggleAutoEmail}
+                title="Toggle Automated Monthly Digest Email"
+                className={`px-3.5 py-2 rounded-xl border text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs ${
+                  autoEmailEnabled ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <Mail size={15} className={autoEmailEnabled ? 'text-teal-600' : 'text-gray-400'} />
+                {autoEmailEnabled ? 'Auto Email: Active' : 'Enable Auto Email'}
+              </button>
 
-            <button
-              onClick={handlePrint}
-              title="Print or Save PDF Report"
-              className="px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-1.5 shadow-2xs"
-            >
-              <Printer size={15} className="text-gray-600" /> Print PDF
-            </button>
+              <button
+                onClick={handlePrint}
+                title="Print or Save PDF Report"
+                className="px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-1.5 shadow-2xs"
+              >
+                <Printer size={15} className="text-gray-600" /> Print PDF
+              </button>
 
-            <Button onClick={exportCSV} title="Export Report as CSV Spreadsheet">
-              <Download size={15} /> Export CSV
-            </Button>
-          </div>
+              <Button onClick={exportCSV} title="Export Report as CSV Spreadsheet">
+                <Download size={15} /> Export CSV
+              </Button>
+            </div>
+          ) : undefined
         }
       />
 
-      {/* 1. Interactive Filters Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white border border-gray-200/80 rounded-2xl p-3 shadow-2xs">
+      {/* Tab Switcher (Analytics vs Customer Outstanding Statement) */}
+      <div className="flex items-center gap-2 border-b border-gray-200 pb-3 no-print">
+        <button
+          onClick={() => setActiveTab('analytics')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'analytics'
+              ? 'bg-teal-700 text-white shadow-sm'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          <BarChart3 size={15} /> Financial Analytics & Trends
+        </button>
+
+        <button
+          onClick={() => setActiveTab('outstanding')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'outstanding'
+              ? 'bg-teal-700 text-white shadow-sm'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          <ShieldAlert size={15} /> Customer Outstanding Statement
+        </button>
+      </div>
+
+
+      {activeTab === 'outstanding' ? (
+        <OutstandingReport />
+      ) : (
+        <>
+          {/* 1. Interactive Filters Bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white border border-gray-200/80 rounded-2xl p-3 shadow-2xs">
+
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <Filter size={15} className="text-teal-600 shrink-0" />
           <span className="text-xs font-bold text-gray-700">Filters:</span>
@@ -343,6 +379,9 @@ export function ReportsPage() {
           </table>
         </div>
       </Card>
+        </>
+      )}
     </div>
   );
 }
+

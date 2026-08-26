@@ -3,7 +3,8 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { Card, PageHeader, Input, Button, Skeleton, Badge, Select } from '@/components/ui';
 import { toast } from '@/components/Toast';
-import { UserPlus, Shield, KeyRound, UserCheck, Lock } from 'lucide-react';
+import { UserPlus, Shield, KeyRound, UserCheck, Lock, Upload, Image as ImageIcon, Camera } from 'lucide-react';
+
 import type { Settings as SettingsType } from '@/lib/types';
 
 interface UserRecord {
@@ -22,7 +23,7 @@ export function SettingsPage() {
   const [savingSettings, setSavingSettings] = useState(false);
 
   // Form states
-  const [form, setForm] = useState({ studio_name: '', currency_symbol: '₹', phone: '', email: '', address: '' });
+  const [form, setForm] = useState({ studio_name: '', currency_symbol: '₹', phone: '', email: '', address: '', gstin: '', logo_url: '' });
   
   // New User Form State
   const [showAddUser, setShowAddUser] = useState(false);
@@ -49,6 +50,8 @@ export function SettingsPage() {
             phone: settingsData.phone || '',
             email: settingsData.email || '',
             address: settingsData.address || '',
+            gstin: settingsData.gstin || '',
+            logo_url: settingsData.logo_url || '',
           });
         }
         setUsersList(usersData || []);
@@ -61,6 +64,20 @@ export function SettingsPage() {
 
     loadData();
   }, []);
+
+  function handleLogoFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setForm((prev) => ({ ...prev, logo_url: event.target!.result as string }));
+        toast('Logo image loaded. Click "Save Studio Profile" to apply.', 'success');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
 
   async function handleSaveSettings() {
     setSavingSettings(true);
@@ -161,12 +178,63 @@ export function SettingsPage() {
             <Input label="Currency Symbol" value={form.currency_symbol} onChange={(e) => setForm({ ...form, currency_symbol: e.target.value })} />
             <Input label="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </div>
+          {/* Studio Logo Section */}
+          <div className="border-t border-b border-gray-100 py-4 my-2">
+            <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">
+              Studio Logo (Appears on Invoices & Statements)
+            </label>
+            
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="w-40 h-24 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center p-2 shrink-0 overflow-hidden relative group">
+                {form.logo_url ? (
+                  <img src={form.logo_url} alt="Studio Logo Preview" className="max-h-full max-w-full object-contain" />
+                ) : (
+                  <div className="text-center text-gray-400">
+                    <Camera size={24} className="mx-auto mb-1 opacity-50" />
+                    <span className="text-[10px] font-medium">No Logo Uploaded</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 space-y-2 w-full">
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-700 text-white text-xs font-semibold hover:bg-teal-800 transition-colors shadow-2xs">
+                    <Upload size={14} /> Upload Logo File
+                    <input type="file" accept="image/*" onChange={handleLogoFileUpload} className="hidden" />
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, logo_url: '/logo.svg', studio_name: 'Aishwarya Videos & Photos' }));
+                      toast('Applied Aishwarya Videos & Photos brand profile', 'info');
+                    }}
+                    className="px-3 py-2 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold hover:bg-purple-100 transition-colors"
+                  >
+                    Set Aishwarya Logo
+                  </button>
+                </div>
+
+                <Input
+                  label="OR Logo Image URL"
+                  placeholder="e.g. /logo.svg or https://example.com/logo.png"
+                  value={form.logo_url}
+                  onChange={(e) => setForm({ ...form, logo_url: e.target.value })}
+                  className="text-xs"
+                />
+              </div>
+            </div>
+          </div>
+
           <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           <Input label="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+          <Input label="GSTIN (Optional)" placeholder="e.g. 33ABCDE1234F1Z5" value={form.gstin} onChange={(e) => setForm({ ...form, gstin: e.target.value })} />
         </div>
+
         <div className="mt-6 flex justify-end">
           <Button onClick={handleSaveSettings} loading={savingSettings}>Save Studio Profile</Button>
         </div>
+
       </Card>
 
       {/* 2. User & Staff Management Card */}

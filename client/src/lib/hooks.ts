@@ -17,7 +17,7 @@ export function useBookings() {
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
-  return { bookings, loading, refresh };
+  return { bookings, loading, refresh, mutate: refresh };
 }
 
 export function useCustomers() {
@@ -32,7 +32,7 @@ export function useCustomers() {
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
-  return { customers, loading, refresh };
+  return { customers, loading, refresh, mutate: refresh };
 }
 
 export function usePayments() {
@@ -50,7 +50,7 @@ export function usePayments() {
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
-  return { payments, loading, refresh };
+  return { payments, loading, refresh, mutate: refresh };
 }
 
 export function useInvoices() {
@@ -68,8 +68,9 @@ export function useInvoices() {
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
-  return { invoices, loading, refresh };
+  return { invoices, loading, refresh, mutate: refresh };
 }
+
 
 export function useSettings() {
   const [settings, setSettings] = useState<Settings | null>(null);

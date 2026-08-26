@@ -279,10 +279,10 @@ export function DashboardPage() {
 
         {/* Card 2: Payments Due (Amber Color Code Accent) */}
         <Card onClick={() => navigate({ page: 'payments' })} hover className="p-5 flex flex-col justify-between bg-gradient-to-br from-amber-50/70 via-white to-white border-amber-200 border-l-4 border-l-amber-500 shadow-2xs group rounded-2xl transition-all">
-          <div>
-            <div className="flex items-center justify-between">
-              <p className="text-2xl sm:text-3xl font-black text-amber-950 leading-none tracking-tight">{formatCurrency(outstandingTotal, CURRENCY)}</p>
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-200">
+          <div className="min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xl sm:text-2xl lg:text-3xl font-black text-amber-950 leading-none tracking-tight truncate">{formatCurrency(outstandingTotal, CURRENCY)}</p>
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-200 shrink-0">
                 Action Req
               </span>
             </div>
@@ -292,6 +292,7 @@ export function DashboardPage() {
           </div>
           <p className="text-xs text-amber-700 font-medium mt-2 truncate">{pendingPayments.length} booking{pendingPayments.length === 1 ? '' : 's'} pending balance</p>
         </Card>
+
 
         {/* Card 3: In Editing (Purple Color Code Accent) */}
         <Card onClick={() => navigate({ page: 'deliverables' })} hover className="p-5 flex flex-col justify-between group rounded-2xl border-gray-200/80 border-l-4 border-l-purple-500 hover:border-purple-300 transition-all shadow-2xs">

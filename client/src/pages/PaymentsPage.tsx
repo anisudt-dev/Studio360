@@ -10,6 +10,9 @@ import { formatCurrency, formatDate, daysFromNow } from '@/lib/format';
 import { paymentStatus, PAYMENT_STATUS_STYLE } from '@/lib/constants';
 import { toast } from '@/components/Toast';
 
+import { PaymentReceiptModal } from '@/components/PaymentReceiptModal';
+import type { Payment, BookingWithCustomer } from '@/lib/types';
+
 const CURRENCY = '₹';
 
 export function PaymentsPage() {
@@ -18,6 +21,8 @@ export function PaymentsPage() {
   const { navigate, openModal } = useNav();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [receiptData, setReceiptData] = useState<{ payment: Payment; booking: BookingWithCustomer } | null>(null);
+
 
   const summary = useMemo(() => {
     const totalContractValue = bookings.reduce((s, b) => s + (b.status !== 'cancelled' ? b.total_amount || 0 : 0), 0);
@@ -342,6 +347,15 @@ export function PaymentsPage() {
           </div>
         </>
       )}
+
+      {receiptData && (
+        <PaymentReceiptModal
+          payment={receiptData.payment}
+          booking={receiptData.booking}
+          onClose={() => setReceiptData(null)}
+        />
+      )}
     </div>
   );
 }
+

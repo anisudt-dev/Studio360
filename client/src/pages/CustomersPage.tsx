@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import {
   Users, Plus, Search, Phone, ChevronRight, Pencil, Trash2,
-  CalendarCheck, CheckSquare, Square, User, MessageCircle, AlertCircle, CheckCircle2
+  CalendarCheck, CheckSquare, Square, User, MessageCircle, AlertCircle, CheckCircle2, FileText
 } from 'lucide-react';
+
 import { useCustomers, useBookings } from '@/lib/hooks';
 import { useNav } from '@/lib/nav';
 import { api } from '@/lib/api';
@@ -145,11 +146,17 @@ export function CustomersPage() {
         title="Customer Directory"
         subtitle={`${customers.length} ${customers.length === 1 ? 'customer' : 'customers'} in your studio database`}
         actions={
-          <Button onClick={() => openModal('addCustomer', {})} title="Add a new customer entry">
-            <Plus size={16} /> Add Customer
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="secondary" onClick={() => navigate({ page: 'reports' })} title="View Customer Outstanding Aging Statement">
+              <FileText size={16} /> Outstanding Report
+            </Button>
+            <Button onClick={() => openModal('addCustomer', {})} title="Add a new customer entry">
+              <Plus size={16} /> Add Customer
+            </Button>
+          </div>
         }
       />
+
 
       {/* Bulk Action Bar */}
       {selectedIds.length > 0 && (

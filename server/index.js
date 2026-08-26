@@ -15,11 +15,24 @@ import {
   Op
 } from './db.js';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.join(__dirname, '../client/dist');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+// Serve Production Built Client Assets
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+}
 
 // In-memory active tokens map: token -> { id, username, name, role }
 const activeTokens = new Map();
@@ -31,6 +44,18 @@ initDb().catch(err => console.error('Failed to init Sequelize DB:', err));
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', ORM: 'Sequelize', timestamp: new Date().toISOString() });
 });
+
+// Root / SPA Fallback Endpoint
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  if (fs.existsSync(path.join(distPath, 'index.html'))) {
+    res.sendFile(path.join(distPath, 'index.html'));
+  } else {
+    res.redirect('http://localhost:5173');
+  }
+});
+
+
 
 // --- AUTHENTICATION ENDPOINTS ---
 
@@ -142,7 +167,7 @@ app.get('/api/settings', async (req, res) => {
 
 app.post('/api/settings', async (req, res) => {
   try {
-    const { studio_name, currency_symbol, phone, email, address } = req.body;
+    const { studio_name, currency_symbol, phone, email, address, logo_url, gstin } = req.body;
     const setting = await Setting.create({
       id: uuidv4(),
       studio_name: studio_name || 'Studio ERP',
@@ -150,12 +175,15 @@ app.post('/api/settings', async (req, res) => {
       phone: phone || null,
       email: email || null,
       address: address || null,
+      logo_url: logo_url || null,
+      gstin: gstin || null,
     });
     res.json(setting);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.put('/api/settings/:id', async (req, res) => {
   try {

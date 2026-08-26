@@ -33,8 +33,9 @@ export interface Booking {
 }
 
 export interface BookingWithCustomer extends Booking {
-  customer?: Pick<Customer, 'id' | 'name' | 'mobile'>;
+  customer?: Pick<Customer, 'id' | 'name' | 'mobile' | 'email' | 'address'>;
 }
+
 
 export interface Payment {
   id: string;
@@ -75,4 +76,8 @@ export interface Settings {
   phone: string | null;
   email: string | null;
   address: string | null;
+  logo_url?: string | null;
+  gstin?: string | null;
 }
+
+
