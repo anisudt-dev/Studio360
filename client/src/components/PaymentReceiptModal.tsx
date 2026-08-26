@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Printer, X, Share2, CheckCircle2, Wallet, MessageCircle } from 'lucide-react';
+import { Printer, X, Share2, CheckCircle2, Wallet, MessageCircle, Mail } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/ui';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { api } from '@/lib/api';
@@ -16,6 +16,7 @@ interface PaymentReceiptModalProps {
 
 export function PaymentReceiptModal({ payment, booking, onClose }: PaymentReceiptModalProps) {
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     api.getSettings().then(setSettings).catch(() => null);
@@ -47,6 +48,22 @@ export function PaymentReceiptModal({ payment, booking, onClose }: PaymentReceip
     window.open(`https://wa.me/${cleanNum.length === 10 ? '91' + cleanNum : cleanNum}?text=${msg}`, '_blank');
   }
 
+  async function handleEmailReceipt() {
+    const defaultEmail = (customer as any)?.email || '';
+    const email = prompt('Enter customer email address to send receipt:', defaultEmail);
+    if (!email) return;
+
+    setSendingEmail(true);
+    try {
+      const res = await api.sendReceiptEmail(payment.id, email);
+      toast(res.message || 'Payment receipt email sent successfully!', 'success');
+    } catch (err: any) {
+      toast(err.message || 'Failed to send payment receipt email', 'error');
+    } finally {
+      setSendingEmail(false);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs overflow-y-auto">
       <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden my-8">
@@ -64,6 +81,13 @@ export function PaymentReceiptModal({ payment, booking, onClose }: PaymentReceip
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={handleEmailReceipt}
+              disabled={sendingEmail}
+              className="px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50"
+            >
+              <Mail size={14} /> Email
+            </button>
             {customer?.mobile && (
               <button
                 onClick={handleWhatsAppShare}
@@ -83,6 +107,7 @@ export function PaymentReceiptModal({ payment, booking, onClose }: PaymentReceip
             </button>
           </div>
         </div>
+
 
         {/* Printable Receipt Container */}
         <div className="p-8 lg:p-10 bg-white print-area">

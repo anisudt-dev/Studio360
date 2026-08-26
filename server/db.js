@@ -236,7 +236,19 @@ export const Setting = sequelize.define('Setting', {
   address: DataTypes.TEXT,
   logo_url: DataTypes.TEXT,
   gstin: DataTypes.STRING,
+  smtp_host: DataTypes.STRING,
+  smtp_port: {
+    type: DataTypes.INTEGER,
+    defaultValue: 587,
+  },
+  smtp_user: DataTypes.STRING,
+  smtp_pass: DataTypes.STRING,
+  sender_name: {
+    type: DataTypes.STRING,
+    defaultValue: 'Aishwarya Videos & Photos',
+  },
 }, {
+
   tableName: 'settings',
   timestamps: false,
 });

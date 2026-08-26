@@ -6,8 +6,10 @@ import {
 } from 'lucide-react';
 import { Card, Button, Skeleton, EmptyState } from '@/components/ui';
 import { formatCurrency, formatDate } from '@/lib/format';
+import { toast } from '@/components/Toast';
 import type { Invoice, Booking, Customer, Settings } from '@/lib/types';
 import { useEffect, useState } from 'react';
+
 
 interface InvoiceWithFullBooking extends Invoice {
   booking?: (Booking & { customer?: Customer }) | null;
@@ -49,6 +51,8 @@ export function InvoiceDetailPage({ id }: { id: string }) {
   const isFullyPaid = balanceDue <= 0 && totalAmount > 0;
   const isPartiallyPaid = paidAmount > 0 && balanceDue > 0;
 
+  const [sendingEmail, setSendingEmail] = useState(false);
+
   function handlePrint() {
     window.print();
   }
@@ -57,6 +61,23 @@ export function InvoiceDetailPage({ id }: { id: string }) {
     const text = `Invoice ${invoice!.invoice_number} for ${formatCurrency(invoice!.total, CURRENCY)}`;
     if (navigator.share) navigator.share({ title: invoice!.invoice_number, text });
     else { navigator.clipboard.writeText(text); }
+  }
+
+  async function handleSendEmail() {
+    if (!invoice) return;
+    const defaultEmail = customer?.email || '';
+    const email = prompt('Enter customer email address:', defaultEmail);
+    if (!email) return;
+
+    setSendingEmail(true);
+    try {
+      const res = await api.sendInvoiceEmail(invoice.id, email);
+      toast(res.message || 'Invoice email sent successfully!', 'success');
+    } catch (err: any) {
+      toast(err.message || 'Failed to send invoice email', 'error');
+    } finally {
+      setSendingEmail(false);
+    }
   }
 
   const studioName = settings?.studio_name && settings.studio_name !== 'Studio ERP' ? settings.studio_name : 'Aishwarya Videos & Photos';
@@ -74,10 +95,14 @@ export function InvoiceDetailPage({ id }: { id: string }) {
           <ArrowLeft size={16} /> Back to Invoices
         </button>
         <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={handleSendEmail} loading={sendingEmail}>
+            <Mail size={14} /> Email Invoice
+          </Button>
           <Button variant="secondary" size="sm" onClick={handleShare}><Share2 size={14} /> Share</Button>
           <Button variant="secondary" size="sm" onClick={handlePrint}><Printer size={14} /> Print Invoice</Button>
         </div>
       </div>
+
 
       {/* Printable Invoice Document */}
       <Card className="p-8 lg:p-12 max-w-3xl mx-auto print-area bg-white border border-gray-200/80 shadow-sm rounded-2xl">

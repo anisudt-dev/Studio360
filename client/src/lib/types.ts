@@ -78,6 +78,12 @@ export interface Settings {
   address: string | null;
   logo_url?: string | null;
   gstin?: string | null;
+  smtp_host?: string | null;
+  smtp_port?: number | null;
+  smtp_user?: string | null;
+  smtp_pass?: string | null;
+  sender_name?: string | null;
 }
+
 
 

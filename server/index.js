@@ -599,6 +599,200 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
+// --- EMAIL DISPATCH HELPERS & ENDPOINTS ---
+
+import nodemailer from 'nodemailer';
+
+async function getEmailTransporter() {
+  const setting = await Setting.findOne();
+  const host = setting?.smtp_host || process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = Number(setting?.smtp_port || process.env.SMTP_PORT || 587);
+  const user = setting?.smtp_user || process.env.SMTP_USER;
+  const pass = setting?.smtp_pass || process.env.SMTP_PASS;
+  const senderName = setting?.sender_name || setting?.studio_name || 'Aishwarya Videos & Photos';
+
+  if (!user || !pass) {
+    throw new Error('SMTP user and password are not configured. Please enter your email credentials in Studio Settings.');
+  }
+
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  });
+
+  return { transporter, from: `"${senderName}" <${user}>`, studioName: senderName };
+}
+
+// 1. Test Email Endpoint
+app.post('/api/email/test', async (req, res) => {
+  try {
+    const { transporter, from } = await getEmailTransporter();
+    const { to } = req.body;
+    if (!to) return res.status(400).json({ error: 'Target email address is required' });
+
+    await transporter.sendMail({
+      from,
+      to,
+      subject: 'Test Email from Studio ERP',
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; color: #333;">
+          <h2 style="color: #701a75;">Email Connection Successful! 🎉</h2>
+          <p>Your studio email configuration is active and working properly.</p>
+        </div>
+      `,
+    });
+
+    res.json({ success: true, message: `Test email sent successfully to ${to}` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 2. Send Invoice Email Endpoint
+app.post('/api/email/send-invoice', async (req, res) => {
+  try {
+    const { invoiceId, targetEmail } = req.body;
+    if (!invoiceId) return res.status(400).json({ error: 'Invoice ID is required' });
+
+    const invoice = await Invoice.findByPk(invoiceId, {
+      include: [{ model: Booking, as: 'booking', include: [{ model: Customer, as: 'customer' }] }],
+    });
+    if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
+
+    const customer = invoice.booking?.customer;
+    const recipient = targetEmail || customer?.email;
+    if (!recipient) return res.status(400).json({ error: 'Customer email address is required' });
+
+    const { transporter, from, studioName } = await getEmailTransporter();
+    const items = typeof invoice.items === 'string' ? JSON.parse(invoice.items) : (invoice.items || []);
+
+    await transporter.sendMail({
+      from,
+      to: recipient,
+      subject: `Invoice ${invoice.invoice_number} from ${studioName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; color: #1e293b;">
+          <div style="text-align: center; border-bottom: 2px solid #701a75; padding-bottom: 16px; margin-bottom: 20px;">
+            <h1 style="color: #701a75; margin: 0; font-size: 24px;">${studioName}</h1>
+            <p style="color: #64748b; font-size: 12px; margin-top: 4px; font-weight: bold;">PHOTOGRAPHY & VIDEOGRAPHY</p>
+          </div>
+
+          <h2 style="font-size: 18px; margin-bottom: 4px; color: #0f172a;">INVOICE ${invoice.invoice_number}</h2>
+          <p style="font-size: 12px; color: #64748b; margin-top: 0;">Date: ${invoice.issue_date || ''}</p>
+
+          <div style="background: #f8fafc; padding: 12px; border-radius: 12px; margin: 16px 0; font-size: 13px;">
+            <p style="margin: 0;"><strong>Billed To:</strong> ${customer?.name || ''}</p>
+            ${customer?.mobile ? `<p style="margin: 4px 0 0 0; color: #475569;">📱 ${customer.mobile}</p>` : ''}
+            ${invoice.booking?.event_type ? `<p style="margin: 4px 0 0 0; color: #475569;">Shoot: ${invoice.booking.event_type} (${invoice.booking.event_date || ''})</p>` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px;">
+            <thead>
+              <tr style="background: #f1f5f9; text-align: left; font-size: 11px; text-transform: uppercase;">
+                <th style="padding: 8px 12px;">Description</th>
+                <th style="padding: 8px 12px; text-align: right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map((it) => `
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <td style="padding: 10px 12px;">${it.description}</td>
+                  <td style="padding: 10px 12px; text-align: right; font-weight: bold;">₹${(it.amount || 0).toLocaleString('en-IN')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div style="border-top: 2px solid #e2e8f0; padding-top: 12px; font-size: 13px; line-height: 1.6;">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Total Amount:</span>
+              <strong>₹${(invoice.total || 0).toLocaleString('en-IN')}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; color: #059669;">
+              <span>Amount Paid:</span>
+              <strong>₹${(invoice.paid_amount || 0).toLocaleString('en-IN')}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; color: #dc2626; font-size: 15px; margin-top: 6px;">
+              <span>Balance Due:</span>
+              <strong>₹${(invoice.balance_due || 0).toLocaleString('en-IN')}</strong>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 16px; font-size: 11px; color: #94a3b8;">
+            <p style="margin: 0;">Thank you for choosing ${studioName}!</p>
+          </div>
+        </div>
+      `,
+    });
+
+    res.json({ success: true, message: `Invoice email sent successfully to ${recipient}` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 3. Send Payment Receipt Email Endpoint
+app.post('/api/email/send-receipt', async (req, res) => {
+  try {
+    const { paymentId, targetEmail } = req.body;
+    if (!paymentId) return res.status(400).json({ error: 'Payment ID is required' });
+
+    const payment = await Payment.findByPk(paymentId, {
+      include: [{ model: Booking, as: 'booking', include: [{ model: Customer, as: 'customer' }] }],
+    });
+    if (!payment) return res.status(404).json({ error: 'Payment not found' });
+
+    const booking = payment.booking;
+    const customer = booking?.customer;
+    const recipient = targetEmail || customer?.email;
+    if (!recipient) return res.status(400).json({ error: 'Customer email address is required' });
+
+    const { transporter, from, studioName } = await getEmailTransporter();
+    const receiptNo = `REC-${payment.id.slice(0, 8).toUpperCase()}`;
+
+    await transporter.sendMail({
+      from,
+      to: recipient,
+      subject: `Payment Receipt ${receiptNo} - ${studioName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; color: #1e293b;">
+          <div style="text-align: center; border-bottom: 2px solid #701a75; padding-bottom: 16px; margin-bottom: 20px;">
+            <h1 style="color: #701a75; margin: 0; font-size: 24px;">${studioName}</h1>
+            <p style="color: #64748b; font-size: 12px; margin-top: 4px; font-weight: bold;">PAYMENT RECEIPT VOUCHER</p>
+          </div>
+
+          <p style="font-size: 13px;">Dear <strong>${customer?.name || 'Customer'}</strong>,</p>
+          <p style="font-size: 13px; color: #475569;">Thank you for your payment. Here is your payment receipt confirmation:</p>
+
+          <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 16px; border-radius: 12px; margin: 16px 0; text-align: center;">
+            <p style="font-size: 11px; color: #047857; text-transform: uppercase; font-weight: bold; margin: 0;">Amount Received</p>
+            <p style="font-size: 28px; font-weight: 900; color: #047857; margin: 4px 0 0 0;">₹${payment.amount.toLocaleString('en-IN')}</p>
+          </div>
+
+          <div style="font-size: 13px; line-height: 1.8; background: #f8fafc; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px;">
+            <div><strong>Receipt #:</strong> ${receiptNo}</div>
+            <div><strong>Date:</strong> ${payment.payment_date}</div>
+            <div><strong>Payment Mode:</strong> ${payment.payment_mode}</div>
+            ${payment.reference ? `<div><strong>Ref #:</strong> ${payment.reference}</div>` : ''}
+            ${booking ? `<div><strong>Remaining Balance:</strong> ₹${booking.balance.toLocaleString('en-IN')}</div>` : ''}
+          </div>
+
+          <div style="margin-top: 24px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 16px; font-size: 11px; color: #94a3b8;">
+            <p style="margin: 0;">Thank you for choosing ${studioName}!</p>
+          </div>
+        </div>
+      `,
+    });
+
+    res.json({ success: true, message: `Payment receipt email sent successfully to ${recipient}` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Node.js Express + Sequelize ORM server running at http://localhost:${PORT}`);
 });
+

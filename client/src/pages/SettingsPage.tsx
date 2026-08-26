@@ -3,7 +3,8 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { Card, PageHeader, Input, Button, Skeleton, Badge, Select } from '@/components/ui';
 import { toast } from '@/components/Toast';
-import { UserPlus, Shield, KeyRound, UserCheck, Lock, Upload, Image as ImageIcon, Camera } from 'lucide-react';
+import { UserPlus, Shield, KeyRound, UserCheck, Lock, Upload, Image as ImageIcon, Camera, Mail, Send } from 'lucide-react';
+
 
 import type { Settings as SettingsType } from '@/lib/types';
 
@@ -23,7 +24,21 @@ export function SettingsPage() {
   const [savingSettings, setSavingSettings] = useState(false);
 
   // Form states
-  const [form, setForm] = useState({ studio_name: '', currency_symbol: '₹', phone: '', email: '', address: '', gstin: '', logo_url: '' });
+  const [form, setForm] = useState({
+    studio_name: '',
+    currency_symbol: '₹',
+    phone: '',
+    email: '',
+    address: '',
+    gstin: '',
+    logo_url: '',
+    smtp_host: 'smtp.gmail.com',
+    smtp_port: 587,
+    smtp_user: '',
+    smtp_pass: '',
+    sender_name: 'Aishwarya Videos & Photos',
+  });
+  const [testingEmail, setTestingEmail] = useState(false);
   
   // New User Form State
   const [showAddUser, setShowAddUser] = useState(false);
@@ -52,6 +67,11 @@ export function SettingsPage() {
             address: settingsData.address || '',
             gstin: settingsData.gstin || '',
             logo_url: settingsData.logo_url || '',
+            smtp_host: settingsData.smtp_host || 'smtp.gmail.com',
+            smtp_port: settingsData.smtp_port || 587,
+            smtp_user: settingsData.smtp_user || '',
+            smtp_pass: settingsData.smtp_pass || '',
+            sender_name: settingsData.sender_name || settingsData.studio_name || 'Aishwarya Videos & Photos',
           });
         }
         setUsersList(usersData || []);
@@ -64,6 +84,28 @@ export function SettingsPage() {
 
     loadData();
   }, []);
+
+  async function handleTestEmail() {
+    if (!form.smtp_user || !form.smtp_pass) {
+      toast('Please enter your SMTP Username and Password first', 'error');
+      return;
+    }
+    const target = prompt('Enter recipient email address to send test email:', form.email || form.smtp_user);
+    if (!target) return;
+
+    setTestingEmail(true);
+    try {
+      // First save current settings so backend picks up the latest SMTP credentials
+      await api.updateSettings(settings?.id || 'default-settings-1', form);
+      const res = await api.testEmail(target);
+      toast(res.message || 'Test email sent successfully!', 'success');
+    } catch (err: any) {
+      toast(err.message || 'Failed to send test email', 'error');
+    } finally {
+      setTestingEmail(false);
+    }
+  }
+
 
   function handleLogoFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -234,8 +276,72 @@ export function SettingsPage() {
         <div className="mt-6 flex justify-end">
           <Button onClick={handleSaveSettings} loading={savingSettings}>Save Studio Profile</Button>
         </div>
-
       </Card>
+
+      {/* 2. Studio Email Dispatch Settings (SMTP) Card */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <Mail size={18} className="text-teal-600" />
+              Studio Email Configuration (SMTP)
+            </h3>
+            <p className="text-xs text-gray-500 mt-0.5">Send official Invoices, Receipts, and Shoot Reminders to clients via email</p>
+          </div>
+          <Button size="sm" variant="secondary" onClick={handleTestEmail} loading={testingEmail}>
+            <Send size={14} /> Send Test Email
+          </Button>
+        </div>
+
+        <div className="space-y-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Sender Name"
+              placeholder="e.g. Aishwarya Videos & Photos"
+              value={form.sender_name}
+              onChange={(e) => setForm({ ...form, sender_name: e.target.value })}
+            />
+            <Input
+              label="SMTP Host"
+              placeholder="e.g. smtp.gmail.com"
+              value={form.smtp_host}
+              onChange={(e) => setForm({ ...form, smtp_host: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Input
+              label="SMTP Port"
+              type="number"
+              placeholder="587"
+              value={String(form.smtp_port)}
+              onChange={(e) => setForm({ ...form, smtp_port: Number(e.target.value) })}
+            />
+            <Input
+              label="SMTP Username / Email"
+              placeholder="your-email@gmail.com"
+              value={form.smtp_user}
+              onChange={(e) => setForm({ ...form, smtp_user: e.target.value })}
+            />
+            <Input
+              label="SMTP Password / App Password"
+              type="password"
+              placeholder="••••••••••••••••"
+              value={form.smtp_pass}
+              onChange={(e) => setForm({ ...form, smtp_pass: e.target.value })}
+            />
+          </div>
+
+          <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] leading-relaxed">
+            💡 <strong>Gmail Users:</strong> Use <code className="bg-amber-100 px-1 py-0.5 rounded">smtp.gmail.com</code> port <code className="bg-amber-100 px-1 py-0.5 rounded">587</code> with a 16-character <strong>Gmail App Password</strong> (generated from your Google Account &gt; Security &gt; App Passwords).
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <Button onClick={handleSaveSettings} loading={savingSettings}>Save Email Credentials</Button>
+        </div>
+      </Card>
+
 
       {/* 2. User & Staff Management Card */}
       <Card className="p-6">

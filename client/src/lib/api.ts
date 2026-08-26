@@ -57,4 +57,10 @@ export const api = {
   getUsers: () => apiFetch('/auth/users'),
   createUser: (data: any) => apiFetch('/auth/users', { method: 'POST', body: JSON.stringify(data) }),
   changePassword: (data: any) => apiFetch('/auth/change-password', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Email Dispatch
+  testEmail: (to: string) => apiFetch('/email/test', { method: 'POST', body: JSON.stringify({ to }) }),
+  sendInvoiceEmail: (invoiceId: string, targetEmail?: string) => apiFetch('/email/send-invoice', { method: 'POST', body: JSON.stringify({ invoiceId, targetEmail }) }),
+  sendReceiptEmail: (paymentId: string, targetEmail?: string) => apiFetch('/email/send-receipt', { method: 'POST', body: JSON.stringify({ paymentId, targetEmail }) }),
 };
+
