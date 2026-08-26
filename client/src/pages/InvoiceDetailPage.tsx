@@ -188,39 +188,39 @@ const CURRENCY = '₹';export function InvoiceDetailPage({ id }: { id: string })
         </div>
 
         {/* 2. Customer & Event Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-6 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-6 py-6 border-b border-gray-100 w-full overflow-hidden">
           {/* Bill To */}
-          <div>
-            <p className="text-[11px] font-bold tracking-wider text-gray-400 uppercase mb-2">BILL TO</p>
-            <p className="text-base font-bold text-gray-900">{customer?.name || '—'}</p>
+          <div className="w-full sm:w-1/2 min-w-0 space-y-1">
+            <p className="text-[11px] font-bold tracking-wider text-gray-400 uppercase mb-1">BILL TO</p>
+            <p className="text-base font-bold text-gray-900 break-words">{customer?.name || '—'}</p>
             {customer?.mobile && (
-              <p className="text-sm text-gray-600 flex items-center gap-1.5 mt-1">
+              <p className="text-sm text-gray-600 flex items-center gap-1.5 pt-0.5 font-medium">
                 <span>📱</span> {customer.mobile}
               </p>
             )}
             {customer?.email && (
-              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1.5">
-                <Mail size={12} className="text-gray-400" /> {customer.email}
+              <p className="text-xs text-gray-500 pt-0.5 flex items-center gap-1.5 truncate">
+                <Mail size={12} className="text-gray-400 shrink-0" /> {customer.email}
               </p>
             )}
             {customer?.address && (
-              <p className="text-xs text-gray-500 mt-1 max-w-xs leading-relaxed">
+              <p className="text-xs text-gray-500 pt-0.5 leading-relaxed break-words">
                 {customer.address}
               </p>
             )}
           </div>
 
           {/* Event Details */}
-          <div className="sm:text-right">
-            <p className="text-[11px] font-bold tracking-wider text-gray-400 uppercase mb-2">EVENT DETAILS</p>
-            <p className="text-base font-bold text-gray-900">{booking?.event_type || 'Photography Event'}</p>
+          <div className="w-full sm:w-1/2 min-w-0 sm:text-right space-y-1">
+            <p className="text-[11px] font-bold tracking-wider text-gray-400 uppercase mb-1">EVENT DETAILS</p>
+            <p className="text-base font-bold text-gray-900 break-words">{booking?.event_type || 'Photography Event'}</p>
             {booking?.event_date && (
-              <p className="text-sm font-medium text-teal-800 mt-0.5">
+              <p className="text-sm font-semibold text-teal-800 pt-0.5">
                 {formatDate(booking.event_date)}
               </p>
             )}
             {booking?.venue && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 pt-0.5 break-words">
                 📍 {booking.venue}
               </p>
             )}
@@ -228,32 +228,32 @@ const CURRENCY = '₹';export function InvoiceDetailPage({ id }: { id: string })
         </div>
 
         {/* 3. Structured Line Items Table */}
-        <div className="my-6">
+        <div className="my-6 overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-bold text-gray-400 uppercase tracking-wider">
                 <th className="py-3 px-1 font-semibold">Description</th>
-                <th className="py-3 px-3 font-semibold text-center w-36">Event Date</th>
+                <th className="py-3 px-3 font-semibold text-center w-32">Event Date</th>
                 <th className="py-3 px-1 font-semibold text-right w-32">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               <tr>
                 <td className="py-4 px-1 align-top">
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-gray-900 break-words">
                     {booking?.event_type ? `${booking.event_type} Photography & Videography` : 'Photography Services'}
                   </p>
                   {booking?.title && (
-                    <p className="text-xs text-gray-500 mt-0.5">{booking.title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 break-words">{booking.title}</p>
                   )}
                   {booking?.package_name && (
-                    <p className="text-xs text-teal-700 font-medium mt-0.5">Package: {booking.package_name}</p>
+                    <p className="text-xs text-teal-700 font-medium mt-0.5 break-words">Package: {booking.package_name}</p>
                   )}
                 </td>
-                <td className="py-4 px-3 align-top text-center text-gray-600 text-xs font-medium">
+                <td className="py-4 px-3 align-top text-center text-gray-600 text-xs font-medium whitespace-nowrap">
                   {booking?.event_date ? formatDate(booking.event_date) : '—'}
                 </td>
-                <td className="py-4 px-1 align-top text-right font-bold text-gray-900">
+                <td className="py-4 px-1 align-top text-right font-bold text-gray-900 whitespace-nowrap">
                   {formatCurrency(invoice.subtotal, CURRENCY)}
                 </td>
               </tr>
@@ -262,7 +262,7 @@ const CURRENCY = '₹';export function InvoiceDetailPage({ id }: { id: string })
                 <tr>
                   <td className="py-3 px-1 text-gray-600 text-xs">Tax / Additional Services</td>
                   <td className="py-3 px-3 text-center text-gray-400 text-xs">—</td>
-                  <td className="py-3 px-1 text-right text-gray-700 font-semibold">{formatCurrency(invoice.tax, CURRENCY)}</td>
+                  <td className="py-3 px-1 text-right text-gray-700 font-semibold whitespace-nowrap">{formatCurrency(invoice.tax, CURRENCY)}</td>
                 </tr>
               )}
             </tbody>
@@ -270,9 +270,9 @@ const CURRENCY = '₹';export function InvoiceDetailPage({ id }: { id: string })
         </div>
 
         {/* 4. Totals Breakdown & Prominent Payment Status Stamp */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 pt-4 border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 pt-4 border-t border-gray-200 w-full">
           {/* Status Badge / Stamp */}
-          <div className="pt-2">
+          <div className="pt-2 shrink-0">
             {isFullyPaid ? (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-50 border-2 border-emerald-500 text-emerald-700 font-extrabold text-sm tracking-wide shadow-xs">
                 <CheckCircle2 size={18} className="text-emerald-600" />
@@ -296,35 +296,36 @@ const CURRENCY = '₹';export function InvoiceDetailPage({ id }: { id: string })
           </div>
 
           {/* Breakdown Box */}
-          <div className="w-full sm:w-64 space-y-2 text-sm">
-            <div className="flex justify-between text-gray-600">
-              <span>Subtotal</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(invoice.subtotal, CURRENCY)}</span>
+          <div className="w-full sm:w-72 space-y-2 text-sm shrink-0">
+            <div className="flex justify-between items-center gap-4 text-gray-600">
+              <span className="shrink-0">Subtotal</span>
+              <span className="font-semibold text-gray-900 text-right">{formatCurrency(invoice.subtotal, CURRENCY)}</span>
             </div>
             {invoice.tax > 0 && (
-              <div className="flex justify-between text-gray-600">
-                <span>Tax</span>
-                <span className="font-semibold text-gray-900">{formatCurrency(invoice.tax, CURRENCY)}</span>
+              <div className="flex justify-between items-center gap-4 text-gray-600">
+                <span className="shrink-0">Tax</span>
+                <span className="font-semibold text-gray-900 text-right">{formatCurrency(invoice.tax, CURRENCY)}</span>
               </div>
             )}
-            <div className="flex justify-between pt-2 border-t border-gray-200 font-bold text-base text-gray-900">
-              <span>Total</span>
-              <span className="text-teal-700 font-extrabold">{formatCurrency(totalAmount, CURRENCY)}</span>
+            <div className="flex justify-between items-center gap-4 pt-2 border-t border-gray-200 font-bold text-base text-gray-900">
+              <span className="shrink-0">Total</span>
+              <span className="text-teal-700 font-extrabold text-right">{formatCurrency(totalAmount, CURRENCY)}</span>
             </div>
 
             {/* Paid & Balance Rows */}
-            <div className="flex justify-between text-xs text-emerald-700 pt-1.5 border-t border-dashed border-gray-200">
-              <span className="font-medium">Paid</span>
-              <span className="font-bold">{formatCurrency(paidAmount, CURRENCY)}</span>
+            <div className="flex justify-between items-center gap-4 text-xs text-emerald-700 pt-1.5 border-t border-dashed border-gray-200">
+              <span className="font-medium shrink-0">Paid</span>
+              <span className="font-bold text-right">{formatCurrency(paidAmount, CURRENCY)}</span>
             </div>
-            <div className="flex justify-between text-xs">
-              <span className={balanceDue > 0 ? 'font-bold text-rose-600' : 'text-gray-500 font-medium'}>Balance Due</span>
-              <span className={balanceDue > 0 ? 'font-extrabold text-rose-600' : 'text-gray-700 font-bold'}>
+            <div className="flex justify-between items-center gap-4 text-xs">
+              <span className={`shrink-0 ${balanceDue > 0 ? 'font-bold text-rose-600' : 'text-gray-500 font-medium'}`}>Balance Due</span>
+              <span className={`text-right ${balanceDue > 0 ? 'font-extrabold text-rose-600' : 'text-gray-700 font-bold'}`}>
                 {formatCurrency(balanceDue, CURRENCY)}
               </span>
             </div>
           </div>
         </div>
+
 
         {/* 5. Notes & Payment Methods */}
         {invoice.notes && (
