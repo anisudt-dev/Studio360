@@ -6,10 +6,9 @@ interface ReleaseNotesModalProps {
   onClose: () => void;
 }
 
-export const APP_VERSION = 'v1.4.2';
-export const APP_BUILD = 'b4e2f89';
+export const APP_VERSION = 'v1.4.3';
+export const APP_BUILD = 'cfd7628';
 export const RELEASE_DATE = '26 Aug 2026';
-
 
 export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
   return (
@@ -30,9 +29,9 @@ export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
               </Badge>
               <span className="text-xs text-teal-200 font-mono">Commit #{APP_BUILD}</span>
             </div>
-            <h3 className="text-lg font-extrabold tracking-tight">PDF Exporting & Shoot Voucher Update</h3>
+            <h3 className="text-lg font-extrabold tracking-tight">PDF Export & Layout Border Optimization</h3>
             <p className="text-xs text-teal-100/90 leading-relaxed">
-              Complete PDF layout overhaul, dedicated Shoot Order Vouchers, and multi-page duplicate prevention.
+              Inclusive border box sizing, 2mm print margin inset, and 100% non-blank PDF exports.
             </p>
           </div>
           <div className="shrink-0">
@@ -99,19 +98,19 @@ export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
           <ul className="space-y-2 text-xs text-gray-600">
             <li className="flex items-start gap-2 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100/60">
               <span className="font-bold text-emerald-700 shrink-0">[Fixed]</span>
+              <span>Enforced `box-sizing: border-box` and 2mm print margin inset to prevent right card borders and signature boxes from clipping.</span>
+            </li>
+            <li className="flex items-start gap-2 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100/60">
+              <span className="font-bold text-emerald-700 shrink-0">[Fixed]</span>
+              <span>Resolved blank white print preview on localhost by positioning printable modals at top z-index layer (`z-999999`).</span>
+            </li>
+            <li className="flex items-start gap-2 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100/60">
+              <span className="font-bold text-emerald-700 shrink-0">[Fixed]</span>
               <span>Fixed Chrome CSS print bug (`position: fixed` header repetition) where receipts duplicated 2 times on Page 1 and Page 2.</span>
             </li>
             <li className="flex items-start gap-2 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100/60">
               <span className="font-bold text-emerald-700 shrink-0">[Fixed]</span>
               <span>Fixed background text bleeding during print where `A n i s h W e d d i n g ...` collapsed into vertical 1-character strips.</span>
-            </li>
-            <li className="flex items-start gap-2 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100/60">
-              <span className="font-bold text-emerald-700 shrink-0">[Fixed]</span>
-              <span>Fixed React Error #310 caused by conditional hook declarations before early returns in `InvoiceDetailPage.tsx`.</span>
-            </li>
-            <li className="flex items-start gap-2 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100/60">
-              <span className="font-bold text-emerald-700 shrink-0">[Fixed]</span>
-              <span>Updated `formatCurrency` to gracefully handle `null`, `undefined`, or missing subtotal figures without throwing errors.</span>
             </li>
           </ul>
         </div>
@@ -133,10 +132,22 @@ export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
               </thead>
               <tbody className="divide-y divide-gray-100 text-gray-700 font-medium">
                 <tr className="bg-teal-50/30">
+                  <td className="py-2 px-3 font-bold text-teal-800">v1.4.3</td>
+                  <td className="py-2 px-3 font-mono text-gray-500">cfd7628</td>
+                  <td className="py-2 px-3">26 Aug 2026</td>
+                  <td className="py-2 px-3 font-semibold text-gray-900">Right border clip fix & border-box print inset</td>
+                </tr>
+                <tr>
+                  <td className="py-2 px-3 font-bold text-teal-800">v1.4.2</td>
+                  <td className="py-2 px-3 font-mono text-gray-500">3956b14</td>
+                  <td className="py-2 px-3">26 Aug 2026</td>
+                  <td className="py-2 px-3">Non-blank print modal z-index layer fix</td>
+                </tr>
+                <tr>
                   <td className="py-2 px-3 font-bold text-teal-800">v1.4.1</td>
                   <td className="py-2 px-3 font-mono text-gray-500">5842382</td>
                   <td className="py-2 px-3">26 Aug 2026</td>
-                  <td className="py-2 px-3 font-semibold text-gray-900">Stop 2-page repetition in PDF exports</td>
+                  <td className="py-2 px-3">Stop 2-page repetition in PDF exports</td>
                 </tr>
                 <tr>
                   <td className="py-2 px-3 font-bold text-teal-800">v1.4.0</td>
@@ -150,12 +161,6 @@ export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
                   <td className="py-2 px-3">26 Aug 2026</td>
                   <td className="py-2 px-3">Mobile & PDF alignment layout fix</td>
                 </tr>
-                <tr>
-                  <td className="py-2 px-3 font-bold text-teal-800">v1.3.8</td>
-                  <td className="py-2 px-3 font-mono text-gray-500">47145ee</td>
-                  <td className="py-2 px-3">26 Aug 2026</td>
-                  <td className="py-2 px-3">React Error #310 fix & ErrorBoundary addition</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -164,3 +169,4 @@ export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
     </Modal>
   );
 }
+
