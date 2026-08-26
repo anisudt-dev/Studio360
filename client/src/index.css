@@ -119,6 +119,10 @@ body {
     size: portrait;
   }
 
+  * {
+    box-sizing: border-box !important;
+  }
+
   /* Hide standard non-printable UI elements */
   .no-print, header, aside, nav, .toast-container, button, .sticky {
     display: none !important;
@@ -183,12 +187,19 @@ body {
     visibility: visible !important;
     width: 100% !important;
     max-width: 100% !important;
+    box-sizing: border-box !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 2mm !important;
     background: #ffffff !important;
     box-shadow: none !important;
     border: none !important;
     overflow: visible !important;
+  }
+
+  /* Prevent card borders & tables from clipping on right page margin */
+  .rounded-2xl, .rounded-xl, .border, table {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   /* Typography safety */
@@ -203,6 +214,7 @@ body {
     border-collapse: collapse !important;
   }
 }
+
 
 
 
