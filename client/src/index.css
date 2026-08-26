@@ -115,80 +115,55 @@ body {
 /* Print styles for Invoices, Payment Receipts & Booking Shoot Vouchers */
 @media print {
   @page {
-    margin: 12mm 15mm;
+    margin: 10mm 12mm;
     size: portrait;
   }
 
-  .no-print, header, aside, nav, .toast-container, button, .sticky {
-    display: none !important;
+  /* Hide everything on the page during print */
+  body * {
+    visibility: hidden !important;
   }
 
-  body, html {
-    background: #ffffff !important;
-    color: #0f172a !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  /* Unhide ONLY the printable area and all its children */
+  .print-area, .print-area * {
+    visibility: visible !important;
+  }
+
+  /* Position .print-area at top-left of the PDF page */
+  .print-area {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
-  }
-
-  main, .max-w-3xl, .max-w-4xl, .max-w-2xl {
-    padding: 0 !important;
-    margin: 0 !important;
     max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  .fixed, .fixed.inset-0 {
-    position: static !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    padding: 0 !important;
     margin: 0 !important;
-    display: block !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
     overflow: visible !important;
-    width: 100% !important;
-    height: auto !important;
+    z-index: 999999 !important;
   }
 
-  .grid {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    justify-content: space-between !important;
-    gap: 16px !important;
+  /* Hide buttons and no-print items */
+  .no-print, .no-print *, button {
+    display: none !important;
+    visibility: hidden !important;
   }
 
-  .grid > div {
-    min-width: 160px !important;
-    flex: 1 1 0% !important;
-  }
-
+  /* Ensure text wrapping safety */
   p, span, h1, h2, h3, h4, div, td, th {
     word-break: normal !important;
     overflow-wrap: break-word !important;
     white-space: normal !important;
-    hyphens: none !important;
   }
 
-  .max-w-2xl, .max-w-3xl, .shadow-2xl, .shadow-xl {
-    max-width: 100% !important;
+  table {
     width: 100% !important;
-    box-shadow: none !important;
-    background: white !important;
-  }
-
-  .print-area {
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    overflow: visible !important;
+    border-collapse: collapse !important;
   }
 }
+
 
 
 
