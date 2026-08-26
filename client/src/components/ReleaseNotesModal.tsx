@@ -6,9 +6,10 @@ interface ReleaseNotesModalProps {
   onClose: () => void;
 }
 
-export const APP_VERSION = 'v1.4.1';
-export const APP_BUILD = '5842382';
+export const APP_VERSION = 'v1.4.2';
+export const APP_BUILD = 'b4e2f89';
 export const RELEASE_DATE = '26 Aug 2026';
+
 
 export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
   return (

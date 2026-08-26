@@ -77,13 +77,14 @@ export function PaymentReceiptModal({ payment, booking, onClose }: PaymentReceip
     }
   }  return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-gray-900/70 backdrop-blur-xs overflow-hidden"
+      className="print-modal fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-gray-900/70 backdrop-blur-xs overflow-hidden"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden my-auto"
+        className="print-modal-content relative w-full max-w-2xl max-h-[92vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden my-auto"
         onClick={(e) => e.stopPropagation()}
       >
+
         
         {/* Sticky Action Header (Always visible at top, hidden during print) */}
         <div className="sticky top-0 z-30 px-5 py-3.5 border-b border-gray-200 flex items-center justify-between no-print bg-white/95 backdrop-blur-md shrink-0 shadow-2xs">
