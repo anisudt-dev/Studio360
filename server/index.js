@@ -51,9 +51,15 @@ app.get('*', (req, res, next) => {
   if (fs.existsSync(path.join(distPath, 'index.html'))) {
     res.sendFile(path.join(distPath, 'index.html'));
   } else {
-    res.redirect('http://localhost:5173');
+    res.json({
+      name: 'Aishwarya Videos & Photos - Studio ERP API',
+      status: 'online',
+      health: '/api/health',
+      timestamp: new Date().toISOString()
+    });
   }
 });
+
 
 
 
