@@ -78,8 +78,16 @@ const CURRENCY = '₹';export function InvoiceDetailPage({ id }: { id: string })
   const isPartiallyPaid = paidAmount > 0 && balanceDue > 0;
 
   function handlePrint() {
+    const originalTitle = document.title;
+    if (invoice) {
+      document.title = `${studioName} - Invoice ${invoice.invoice_number}`;
+    }
     window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 500);
   }
+
 
 
   function handleShare() {

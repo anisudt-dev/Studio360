@@ -112,23 +112,57 @@ body {
   }
 }
 
-/* Print styles for invoices */
+/* Print styles for Invoices & Payment Receipts */
 @media print {
+  @page {
+    margin: 12mm 15mm;
+    size: auto;
+  }
 
-  .no-print, header, aside, nav, .toast-container, button {
+  .no-print, header, aside, nav, .toast-container, button, .sticky {
     display: none !important;
   }
-  body {
-    background: white !important;
+
+  body, html {
+    background: #ffffff !important;
     color: #0f172a !important;
     margin: 0 !important;
     padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
   }
+
   main {
     padding: 0 !important;
     margin: 0 !important;
     max-width: 100% !important;
+    width: 100% !important;
   }
+
+  .fixed, .fixed.inset-0 {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .max-w-2xl, .max-w-3xl, .rounded-3xl, .rounded-2xl, .shadow-2xl, .shadow-xl {
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   .print-area {
     box-shadow: none !important;
     border: none !important;
@@ -136,6 +170,8 @@ body {
     margin: 0 !important;
     max-width: 100% !important;
     width: 100% !important;
+    overflow: visible !important;
   }
 }
+
 

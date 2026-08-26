@@ -40,8 +40,14 @@ export function PaymentReceiptModal({ payment, booking, onClose }: PaymentReceip
   const receiptNo = `REC-${payment.id.slice(0, 8).toUpperCase()}`;
 
   function handlePrint() {
+    const originalTitle = document.title;
+    document.title = `${studioName} - Payment Receipt - ${receiptNo}`;
     window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 500);
   }
+
 
   function handleWhatsAppShare() {
     if (!customer?.mobile) {
