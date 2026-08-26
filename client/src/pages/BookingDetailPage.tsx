@@ -4,7 +4,8 @@ import { useNav } from '@/lib/nav';
 import {
   ArrowLeft, Phone, MessageCircle, Wallet,
   Edit, FileText, Calendar, MapPin, Clock, Package,
-  ChevronRight, Trash2, ArrowRight,
+  ChevronRight, Trash2, ArrowRight, Printer,
+
 } from 'lucide-react';
 import { Card, Button, Badge, Skeleton, EmptyState, ProgressBar } from '@/components/ui';
 import { toast } from '@/components/Toast';
@@ -79,21 +80,36 @@ export function BookingDetailPage({ id }: { id: string }) {
     navigate({ page: 'bookings' });
   }
 
+  function handlePrintBooking() {
+    const originalTitle = document.title;
+    document.title = `Aishwarya Videos & Photos - Shoot Order - ${booking?.title || customer?.name || 'Booking'}`;
+    window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 500);
+  }
+
   return (
     <div className="max-w-3xl mx-auto">
-      <button onClick={() => navigate({ page: 'bookings' })} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-6">
-        <ArrowLeft size={16} /> Bookings
-      </button>
+      <div className="flex items-center justify-between mb-6 no-print">
+        <button onClick={() => navigate({ page: 'bookings' })} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
+          <ArrowLeft size={16} /> Back to Bookings
+        </button>
+        <Button variant="secondary" size="sm" onClick={handlePrintBooking}>
+          <Printer size={14} /> Print Shoot Voucher
+        </Button>
+      </div>
 
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-6 border-b border-gray-100 pb-6">
         <div className="flex items-center gap-2 mb-3">
           <Badge className={bs.badge} dot={bs.dot}>{bs.label}</Badge>
           <Badge className={projStyle.badge} dot={projStyle.dot}>{projStyle.label}</Badge>
         </div>
         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{booking.title || customer?.name}</h1>
-        <p className="text-lg text-gray-500 mt-1">{booking.event_type}</p>
+        <p className="text-lg text-gray-500 mt-1">{booking.event_type} Photography & Videography</p>
       </div>
+
 
       {/* Next Action — prominent */}
       {action && (

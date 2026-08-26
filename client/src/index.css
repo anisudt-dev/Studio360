@@ -112,11 +112,11 @@ body {
   }
 }
 
-/* Print styles for Invoices & Payment Receipts */
+/* Print styles for Invoices, Payment Receipts & Booking Shoot Vouchers */
 @media print {
   @page {
     margin: 12mm 15mm;
-    size: auto;
+    size: portrait;
   }
 
   .no-print, header, aside, nav, .toast-container, button, .sticky {
@@ -133,7 +133,7 @@ body {
     overflow: visible !important;
   }
 
-  main {
+  main, .max-w-3xl, .max-w-4xl, .max-w-2xl {
     padding: 0 !important;
     margin: 0 !important;
     max-width: 100% !important;
@@ -152,15 +152,31 @@ body {
     height: auto !important;
   }
 
-  .max-w-2xl, .max-w-3xl, .rounded-3xl, .rounded-2xl, .shadow-2xl, .shadow-xl {
+  .grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+  }
+
+  .grid > div {
+    min-width: 160px !important;
+    flex: 1 1 0% !important;
+  }
+
+  p, span, h1, h2, h3, h4, div, td, th {
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    hyphens: none !important;
+  }
+
+  .max-w-2xl, .max-w-3xl, .shadow-2xl, .shadow-xl {
     max-width: 100% !important;
     width: 100% !important;
-    border-radius: 0 !important;
     box-shadow: none !important;
-    border: none !important;
     background: white !important;
-    margin: 0 !important;
-    padding: 0 !important;
   }
 
   .print-area {
@@ -173,5 +189,6 @@ body {
     overflow: visible !important;
   }
 }
+
 
 
