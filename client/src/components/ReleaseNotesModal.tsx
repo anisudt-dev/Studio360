@@ -6,8 +6,8 @@ interface ReleaseNotesModalProps {
   onClose: () => void;
 }
 
-export const APP_VERSION = 'v1.4.3';
-export const APP_BUILD = 'cfd7628';
+export const APP_VERSION = 'v1.5.0';
+export const APP_BUILD = '1e687df';
 export const RELEASE_DATE = '26 Aug 2026';
 
 export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
@@ -29,9 +29,9 @@ export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
               </Badge>
               <span className="text-xs text-teal-200 font-mono">Commit #{APP_BUILD}</span>
             </div>
-            <h3 className="text-lg font-extrabold tracking-tight">PDF Export & Layout Border Optimization</h3>
+            <h3 className="text-lg font-extrabold tracking-tight">1-Click CSV Spreadsheet Export Feature</h3>
             <p className="text-xs text-teal-100/90 leading-relaxed">
-              Inclusive border box sizing, 2mm print margin inset, and 100% non-blank PDF exports.
+              Export customer directories & booking ledgers directly into Excel / CSV spreadsheets.
             </p>
           </div>
           <div className="shrink-0">
@@ -50,6 +50,16 @@ export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="p-3.5 rounded-xl border border-gray-200/80 bg-gray-50/50 space-y-1">
               <div className="flex items-center gap-2 font-bold text-gray-900">
+                <FileText size={16} className="text-teal-600 shrink-0" />
+                <span>1-Click CSV Spreadsheet Export</span>
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Click "Export CSV" on Customer Directory or Bookings Page to instantly download a clean Excel/CSV file with names, phone numbers, shoot dates, contract values, and balances due.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl border border-gray-200/80 bg-gray-50/50 space-y-1">
+              <div className="flex items-center gap-2 font-bold text-gray-900">
                 <Printer size={16} className="text-teal-600 shrink-0" />
                 <span>Dedicated Shoot Order Voucher</span>
               </div>
@@ -57,6 +67,7 @@ export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
                 Click "Print Shoot Voucher" on any booking to generate an official Shoot Confirmation with studio logo, client details, logistics, financial breakdown, and signature box.
               </p>
             </div>
+
 
             <div className="p-3.5 rounded-xl border border-gray-200/80 bg-gray-50/50 space-y-1">
               <div className="flex items-center gap-2 font-bold text-gray-900">
@@ -132,11 +143,18 @@ export function ReleaseNotesModal({ open, onClose }: ReleaseNotesModalProps) {
               </thead>
               <tbody className="divide-y divide-gray-100 text-gray-700 font-medium">
                 <tr className="bg-teal-50/30">
+                  <td className="py-2 px-3 font-bold text-teal-800">v1.5.0</td>
+                  <td className="py-2 px-3 font-mono text-gray-500">1e687df</td>
+                  <td className="py-2 px-3">26 Aug 2026</td>
+                  <td className="py-2 px-3 font-semibold text-gray-900">1-Click CSV Spreadsheet Export Feature</td>
+                </tr>
+                <tr>
                   <td className="py-2 px-3 font-bold text-teal-800">v1.4.3</td>
                   <td className="py-2 px-3 font-mono text-gray-500">cfd7628</td>
                   <td className="py-2 px-3">26 Aug 2026</td>
-                  <td className="py-2 px-3 font-semibold text-gray-900">Right border clip fix & border-box print inset</td>
+                  <td className="py-2 px-3">Right border clip fix & border-box print inset</td>
                 </tr>
+
                 <tr>
                   <td className="py-2 px-3 font-bold text-teal-800">v1.4.2</td>
                   <td className="py-2 px-3 font-mono text-gray-500">3956b14</td>

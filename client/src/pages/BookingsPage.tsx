@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react';
 import {
   Plus, Search, CalendarCheck, ChevronRight, MapPin, Wallet,
   Pencil, Trash2, Eye, Calendar, CheckSquare, Square, CheckCircle2,
-  PackageCheck, RefreshCw, Filter
+  PackageCheck, RefreshCw, Filter, Download
 } from 'lucide-react';
+
 import { useBookings } from '@/lib/hooks';
 import { useNav } from '@/lib/nav';
 import { api } from '@/lib/api';
@@ -124,6 +125,34 @@ export function BookingsPage() {
     }
   }
 
+  function handleExportBookingsCSV() {
+    if (bookings.length === 0) {
+      toast('No booking records to export', 'error');
+      return;
+    }
+    const headers = ['Booking ID', 'Customer', 'Event Type', 'Shoot Date', 'Venue', 'Total Amount', 'Paid Amount', 'Balance Due', 'Workflow Status'];
+    const rows = bookings.map((b) => [
+      `"${b.id}"`,
+      `"${(b.customer?.name || '').replace(/"/g, '""')}"`,
+      `"${(b.event_type || '').replace(/"/g, '""')}"`,
+      `"${b.event_date ? formatDate(b.event_date) : ''}"`,
+      `"${(b.venue || '').replace(/"/g, '""')}"`,
+      `"${b.total_amount || 0}"`,
+      `"${b.paid_amount || 0}"`,
+      `"${b.balance || 0}"`,
+      `"${b.project_status}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Studio360_Bookings_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast('Bookings CSV exported successfully!', 'success');
+  }
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -141,6 +170,9 @@ export function BookingsPage() {
         subtitle={`Managing ${bookings.length} total studio bookings`}
         actions={
           <div className="flex items-center gap-2">
+            <Button variant="secondary" onClick={handleExportBookingsCSV} title="Export Bookings to CSV Spreadsheet">
+              <Download size={16} /> Export CSV
+            </Button>
             <button
               onClick={() => navigate({ page: 'calendar' })}
               title="Switch to Calendar Schedule View"
@@ -154,6 +186,7 @@ export function BookingsPage() {
           </div>
         }
       />
+
 
       {/* 4. Bulk Action Bar (Appears when items are selected) */}
       {selectedIds.length > 0 && (

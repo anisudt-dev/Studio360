@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import {
   Users, Plus, Search, Phone, ChevronRight, Pencil, Trash2,
-  CalendarCheck, CheckSquare, Square, User, MessageCircle, AlertCircle, CheckCircle2, FileText
+  CalendarCheck, CheckSquare, Square, User, MessageCircle, AlertCircle, CheckCircle2, FileText, Download
 } from 'lucide-react';
+
 
 import { useCustomers, useBookings } from '@/lib/hooks';
 import { useNav } from '@/lib/nav';
@@ -131,6 +132,31 @@ export function CustomersPage() {
     window.open(`https://wa.me/${cleanNum}`, '_blank');
   }
 
+  function handleExportCSV() {
+    if (customers.length === 0) {
+      toast('No customer records to export', 'error');
+      return;
+    }
+    const headers = ['Name', 'Mobile', 'Email', 'Address', 'Notes', 'Created At'];
+    const rows = customers.map((c) => [
+      `"${(c.name || '').replace(/"/g, '""')}"`,
+      `"${(c.mobile || '').replace(/"/g, '""')}"`,
+      `"${(c.email || '').replace(/"/g, '""')}"`,
+      `"${(c.address || '').replace(/"/g, '""')}"`,
+      `"${(c.notes || '').replace(/"/g, '""')}"`,
+      `"${c.created_at ? formatDate(c.created_at) : ''}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Studio360_Customers_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast('Customer CSV exported successfully!', 'success');
+  }
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -147,6 +173,9 @@ export function CustomersPage() {
         subtitle={`${customers.length} ${customers.length === 1 ? 'customer' : 'customers'} in your studio database`}
         actions={
           <div className="flex items-center gap-2">
+            <Button variant="secondary" onClick={handleExportCSV} title="Export Customers to CSV Spreadsheet">
+              <Download size={16} /> Export CSV
+            </Button>
             <Button variant="secondary" onClick={() => navigate({ page: 'reports' })} title="View Customer Outstanding Aging Statement">
               <FileText size={16} /> Outstanding Report
             </Button>
@@ -156,6 +185,7 @@ export function CustomersPage() {
           </div>
         }
       />
+
 
 
       {/* Bulk Action Bar */}
