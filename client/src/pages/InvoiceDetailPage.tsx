@@ -15,14 +15,13 @@ interface InvoiceWithFullBooking extends Invoice {
   booking?: (Booking & { customer?: Customer }) | null;
 }
 
-const CURRENCY = '₹';
-
-export function InvoiceDetailPage({ id }: { id: string }) {
+const CURRENCY = '₹';export function InvoiceDetailPage({ id }: { id: string }) {
   const { navigate } = useNav();
   const [invoice, setInvoice] = useState<InvoiceWithFullBooking | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -71,7 +70,6 @@ export function InvoiceDetailPage({ id }: { id: string }) {
   const booking = invoice.booking;
   const customer = booking?.customer;
 
-
   // Calculate payments
   const totalAmount = invoice.total || booking?.total_amount || 0;
   const paidAmount = booking?.paid_amount || 0;
@@ -79,11 +77,10 @@ export function InvoiceDetailPage({ id }: { id: string }) {
   const isFullyPaid = balanceDue <= 0 && totalAmount > 0;
   const isPartiallyPaid = paidAmount > 0 && balanceDue > 0;
 
-  const [sendingEmail, setSendingEmail] = useState(false);
-
   function handlePrint() {
     window.print();
   }
+
 
   function handleShare() {
     const text = `Invoice ${invoice!.invoice_number} for ${formatCurrency(invoice!.total, CURRENCY)}`;
